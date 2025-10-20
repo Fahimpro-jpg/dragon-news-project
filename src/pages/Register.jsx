@@ -1,24 +1,44 @@
-import React, { use } from 'react';
-import { Link } from 'react-router';
+import React, { use, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../Provider/AuthProvider';
 
 const Register = () => {
+    const [nameError,setNameError]= useState("")
 
-    const {createUser,setUser}  = use(AuthContext)
+    const navigate = useNavigate()
+    const {createUser,setUser,updateUser}  = use(AuthContext)
     const handleRegister = (e)=>{
         e.preventDefault()
         
         const form = e.target;
         const name = form.name.value
+        if(name.length<5){
+            setNameError('Name should be more than 5 character')
+            return
+        }
+        else{
+            setNameError("")
+        }
         const photo = form.photo.value
         const email = form.email.value
         const password = form.password.value
-        console.log(name,photo,password,email)
+        // console.log(name,photo,password,email)
         createUser(email,password)
         .then(result=>{
             const user = result.user;
             // console.log(user)
-           setUser(user)
+            updateUser({displayName:name,
+                PhotoURL: photo
+            }).then(()=>{
+                setUser({...user,displayName:name,
+                PhotoURL: photo})
+                navigate("/")
+            })
+            .catch(()=>{
+                // console.log(error)
+                setUser(user);
+            })
+           
         })
         .catch(error=>{
             
@@ -37,6 +57,7 @@ const Register = () => {
           <label className="label text-[#403F3F] font-semibold">Your Name</label>
           <input name='name' type="text" className="input" placeholder="Enter your name"
           required />
+          {nameError && <p className='text-red-500'>{nameError}</p>}
           {/* photo url */}
           <label className="label text-[#403F3F] font-semibold">Photo URL</label>
           <input name='photo' type="text" className="input" placeholder="Enter Your PhotoURl"
