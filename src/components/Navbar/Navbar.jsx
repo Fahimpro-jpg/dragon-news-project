@@ -4,8 +4,18 @@ import loginLogo from "../../assets/user.png"
 import { AuthContext } from '../../Provider/AuthProvider';
 const Navbar = () => {
 
-    const {user} = use(AuthContext)
+    const {user,logOut} = use(AuthContext)
 
+    const handleLogOut =()=>{
+        console.log('user trying to log out')
+        logOut()
+        .then(()=>{
+            alert('You log out successfully')
+        })
+        .catch(error=>{
+            console.log(error)
+        })
+    }
     return (
         <div className='flex justify-between items-center'>
            <div className=''> {user && user.email} </div>
@@ -16,9 +26,12 @@ const Navbar = () => {
            </div>
            <div className='login-btn flex gap-2'>
             <img src={loginLogo} alt="" />
-            <Link to="/auth/login" className='btn btn-primary px-10'>
+            {
+                user? <button  onClick={handleLogOut} className='btn btn-primary px-10'>Logout</button>:  <Link to="/auth/login" className='btn btn-primary px-10'>
                 Login
             </Link>
+            }
+           
            </div>
         </div>
     );
